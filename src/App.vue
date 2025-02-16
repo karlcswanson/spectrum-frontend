@@ -7,7 +7,7 @@ import {useIntervalFn} from "@vueuse/core";
 
 import type Socks from "@/socks.ts";
 
-import sensors from '@/directory.json'
+// import sensors from '@/directory.json'
 
 const generalStore = GeneralStore()
 const socks = inject('socks') as Socks
@@ -27,9 +27,9 @@ const { pause, resume, isActive } = useIntervalFn(() => {
 
 onMounted(() => {
   console.log("connecting to MQTT")
-  if (sensors) {
-    generalStore.sensors = sensors
-  }
+  // if (sensors) {
+  //   generalStore.sensors = sensors
+  // }
   socks.setup({
     servers: [{ host: 'localhost', port: 8083, protocol: 'ws'}]
   })

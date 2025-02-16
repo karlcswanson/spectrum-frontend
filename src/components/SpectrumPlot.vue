@@ -106,7 +106,6 @@ export default defineComponent({
 
 
       const drawChart = () => {
-        console.log("drawing chart")
         const svgElement = d3.select(svg.value as HTMLElement)
         svgElement.selectAll('*').remove()
 
@@ -121,8 +120,6 @@ export default defineComponent({
         const colors = d3.scaleOrdinal(d3.schemeCategory10)
 
         const data = cdGen()
-        console.log("chart_data: ")
-        console.log(data)
 
         const line = d3
           .line()
