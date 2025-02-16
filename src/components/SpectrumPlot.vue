@@ -23,11 +23,12 @@ import {computed, defineComponent, onMounted, ref, watch} from "vue";
 import * as d3 from 'd3'
 import {useElementSize, useEventBus} from "@vueuse/core";
 import type {RTLPowerLine} from "@/socks.ts";
-
+import GeneralStore from '@/stores/general.ts'
 
 export default defineComponent({
     name:'SpectrumPlot',
     setup() {
+      const generalStore = GeneralStore()
       const svg = ref<HTMLElement>()
       const { width, height } = useElementSize(svg)
       const margin = { top: 20, right: 30, bottom: 30, left: 40 }
@@ -78,7 +79,6 @@ export default defineComponent({
 
         chart_data[id].power.set(power, bin_start_index)
 
-        drawChart();
       }
 
 
@@ -165,6 +165,12 @@ export default defineComponent({
 
       }
 
+      watch(
+        () => generalStore.render_timer,
+        () => {
+          drawChart()
+        }
+      )
 
       return {
         svg,

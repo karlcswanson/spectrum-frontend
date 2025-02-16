@@ -3,6 +3,8 @@ import GeneralStore from '@/stores/general.ts'
 import { RouterView } from 'vue-router'
 import {inject, onMounted, ref} from "vue";
 import {Menubar} from "primevue";
+import {useIntervalFn} from "@vueuse/core";
+
 import type Socks from "@/socks.ts";
 
 import sensors from '@/directory.json'
@@ -18,7 +20,9 @@ const items = ref([
 
 ])
 
-
+const { pause, resume, isActive } = useIntervalFn(() => {
+  generalStore.render_timer = new Date()
+}, 150)
 
 
 onMounted(() => {
