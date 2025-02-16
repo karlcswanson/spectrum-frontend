@@ -6,6 +6,7 @@ import {useEventBus} from "@vueuse/core";
 
 
 export interface RTLPowerLine {
+  id: string
   timestamp: Date
   hz_lo: number
   hz_hi: number
@@ -60,7 +61,6 @@ export default class Socks {
       const stream_topic = mqttexec(mqttPattern.spectrum_stream, topic)
       if (stream_topic) {
         const data = JSON.parse(message.toString())
-        console.log(data)
         this.bus.emit({
           ...data,
           timestamp: new Date(data.timestamp)}

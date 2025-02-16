@@ -27,7 +27,7 @@ onMounted(() => {
     generalStore.sensors = sensors
   }
   socks.setup({
-    servers: [{ host: '192.168.109.218', port: 8083, protocol: 'ws'}]
+    servers: [{ host: 'localhost', port: 8083, protocol: 'ws'}]
   })
   console.log(generalStore.sensors)
 })
