@@ -85,98 +85,9 @@ export default defineComponent({
         console.log("match: "+ match + "start index: " + bin_start_index + " HzLo: " + hz_lo + " hzHi: " + hz_hi + " step: " + step + " binfreq: " + chart_data[id].frequency[bin_start_index])
         chart_data[id].power.set(power, bin_start_index)
         console.log(chart_data[id])
-        if (hz_hi == 608000000) {
-          console.log(power)
-        }
-
-        hz_lo = hz_lo / 1e6; // Convert to MHz
-        step = step / 1e6;   // Convert to MHz
-
-        const frequencies = Array.from(
-          { length: power.length },
-          (_, i) => hz_lo + step * i
-        );
-
-        const newScan = {
-          scan_data: power.map((p, i) => ({
-            frequency: frequencies[i],
-            power: p,
-          })),
-        };
-
-        chartData.last_scan_history.push(newScan);
-
-        // If the history exceeds 10 scans, remove the oldest one
-        if (chartData.last_scan_history.length > 137) {
-          chartData.last_scan_history.shift(); // Remove the oldest scan
-        }
 
         drawChart();
       }
-
-
-
-
-      let chartData: {
-        scan: { frequency: number; power: number; condition: string }[];
-        peak: { frequency: number; power: number }[];
-        last_scan_history: { scan_data: { frequency: number; power: number }[] }[]; // Store multiple scans
-      } = {
-        average: [],
-        peak: [],
-        last_scan_history: [], // Initialize empty history
-      };
-
-
-      function gridLines() {
-        const start_freq = 470
-        const end_freq = 608
-        const uhf_list = []
-        for (let i = start_freq; i <= end_freq; i += 6) {
-          uhf_list.push(i)
-        }
-        return uhf_list
-      }
-
-
-      const drawChart2 = () => {
-        const svgElement = d3.select(svg.value);
-        svgElement.selectAll('*').remove(); // Clear what exists before re-drawing
-
-        const chartGroup = svgElement
-          .append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`);
-
-        const xScale = d3
-          .scaleLinear([470, 608], chartWidth.value);
-        const yScale = d3
-          .scaleLinear([-120, -20], chartHeight.value);
-
-        const line = d3
-          .line()
-          .x((d) => xScale(d[0]))
-          .y((d) => yScale(d[1]));
-
-        // Render history slices in order (oldest to newest)
-        chartData.last_scan_history.forEach((slice, index) => {
-          const sliceData = slice.scan_data.map(({ frequency, power }) => [
-            frequency,
-            power,
-          ]);
-
-
-
-          chartGroup
-            .append('path')
-            .datum(sliceData)
-            .attr('class', 'line')
-            .attr('d', line)
-            // Apply styles based on position in history
-            .style('stroke', index === chartData.last_scan_history.length - 1 ? 'green' : 'darkgreen') // Bright green for newest, dark for the rest
-            .style('stroke-width', index === chartData.last_scan_history.length - 1 ? 1 : 0.5) // Thicker stroke for newest scan
-            .style('opacity', index === chartData.last_scan_history.length - 1 ? 1 : 0.4); // Newest scan is opaque, older scans fade
-        });
-      };
 
 
 
