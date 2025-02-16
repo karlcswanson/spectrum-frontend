@@ -61,7 +61,7 @@ export default defineComponent({
 
       function listener(event: RTLPowerLine) {
 
-        let {id, hz_lo, hz_hi, step, power } = event;
+        let {id, hz_lo, step, power } = event;
 
         if (!(id in chart_data)) {
           chart_data[id] = {
@@ -71,20 +71,12 @@ export default defineComponent({
           }
           chart_data[id].frequency = createFrequencyArray(470000000, 608000000, 25000)
           chart_data[id].power = new Float64Array(chart_data[id].frequency.length)
-          console.log(`new freq: ${chart_data[id].frequency.length} newpower: ${chart_data[id].power.length}`)
         }
 
         const bin_start_index = (hz_lo - chart_data[id].frequency[0])/step
 
 
-        const total_bins = (608000000 - 470000000) / 25000
-        console.log(total_bins)
-
-
-        const match = chart_data[id].frequency[bin_start_index] === hz_lo
-        console.log("match: "+ match + "start index: " + bin_start_index + " HzLo: " + hz_lo + " hzHi: " + hz_hi + " step: " + step + " binfreq: " + chart_data[id].frequency[bin_start_index])
         chart_data[id].power.set(power, bin_start_index)
-        console.log(chart_data[id])
 
         drawChart();
       }
@@ -98,11 +90,13 @@ export default defineComponent({
           if (chart_data.hasOwnProperty(id)) {
             const id_data = []
             for (let i = 0; i < chart_data[id].frequency.length; i++) {
-              id_data.push({
-                frequency: chart_data[id].frequency[i],
-                power: chart_data[id].power[i],
-                id: id
-              });
+              if (chart_data[id].power[i] !== 0) {
+                id_data.push({
+                  frequency: chart_data[id].frequency[i],
+                  power: chart_data[id].power[i],
+                  id: id
+                });
+              }
             }
             plotData.push(id_data)
           }
@@ -171,35 +165,6 @@ export default defineComponent({
 
       }
 
-
-      async function getData() {
-        const url = "http://localhost:8000/api/scanner/1/scans"
-        try {
-          const response = await fetch(url)
-          if (!response.ok) {
-            console.log("err" + response.status)
-          }
-          return await response.json()
-        } catch (e) {
-          console.error(e)
-        }
-      }
-
-      // watch(() => width.value,
-      //   () => {
-      //     drawChart()
-      //   }
-      // )
-
-      // onMounted(() => {
-      //   const data = getData().then(data => {
-      //     chartData = data
-      //     console.log(chartData.peak)
-      //     console.log(chartData.average)
-      //
-      //     drawChart()
-      //   })
-      // })
 
       return {
         svg,
