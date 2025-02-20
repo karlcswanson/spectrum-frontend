@@ -50,7 +50,8 @@ export default class Socks {
     this.config = config
     this.client = mqtt.connect({
       servers: this.config.servers,
-      protocolVersion: 5
+      protocolVersion: 5,
+      transformWsUrl: (url) => `${url}socks`
     })
 
     this.client.on('connect', () => {

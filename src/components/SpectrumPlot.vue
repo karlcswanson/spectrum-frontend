@@ -38,7 +38,12 @@ export default defineComponent({
 
       const unsubscribe = bus.on(listener)
 
-
+      const selected_sources = computed(() => {
+        if (generalStore.detail_sources.length > 0 ) {
+          return generalStore.detail_sources.map(x => x["id"])
+        }
+        return []
+      })
 
       interface ChartDataType {
         frequency: Float64Array
@@ -84,10 +89,11 @@ export default defineComponent({
 
 
       function cdGen() {
+        if (selected_sources.value.length === 0) return []
         const plotData = [];
 
         for (const id in chart_data) {
-          if (chart_data.hasOwnProperty(id)) {
+          if (chart_data.hasOwnProperty(id) && selected_sources.value.includes(id)) {
             const id_data = []
             for (let i = 0; i < chart_data[id].frequency.length; i++) {
               if (chart_data[id].power[i] !== 0) {
@@ -174,6 +180,7 @@ export default defineComponent({
         width,
         height,
         chartHeight,
+        selected_sources,
       }
     }
   })

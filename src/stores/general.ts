@@ -9,13 +9,15 @@ export interface SensorInfo {
 }
 
 export interface State {
-  sensors: Array<SensorInfo>
+  sensors: Record<string, SensorInfo>
   render_timer: any | null
+  detail_sources: Array<string>
 }
 
 export default defineStore('general', {
   state: (): State => ({
-    sensors: [],
-    render_timer: null
+    sensors: {},
+    render_timer: null,
+    detail_sources: [],
   })
 })

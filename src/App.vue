@@ -31,7 +31,9 @@ onMounted(() => {
   //   generalStore.sensors = sensors
   // }
   socks.setup({
-    servers: [{ host: 'localhost', port: 8083, protocol: 'ws'}]
+    // servers: [{ host: 'spectrum.zt.karlcswanson.com', port: 8083, protocol: 'ws'}]
+    servers: [{ host: 'spectrum.micboard.io', port: 443, protocol: 'wss'}]
+
   })
   console.log(generalStore.sensors)
 })
