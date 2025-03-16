@@ -55,23 +55,28 @@ export default class Socks {
     })
 
     this.client.on('connect', () => {
-      console.log('connected to mqtt')
       log.info('connected to mqtt')
     })
 
     this.client.subscribe(mqttclean(mqttPattern.spectrum_stream),
       (e) => {
-        console.log(e)
+        if (e) {
+          log.error(e)
+        }
     })
 
     this.client.subscribe(mqttclean(mqttPattern.status),
       (e) => {
-        console.log(e)
+        if (e) {
+          log.error(e)
+        }
     })
 
     this.client.subscribe(mqttclean(mqttPattern.scan),
       (e) => {
-        console.log(e)
+        if (e) {
+          log.error(e)
+        }
     })
 
     this.client.on('message', (topic, message) => {
@@ -88,14 +93,17 @@ export default class Socks {
         const data = JSON.parse(message.toString())
         this.scanData[data.id] = data
         this.generalStore.sensors[data.id].last_scan = new Date(data.timestamp)
-        console.log(this.generalStore.sensors)
-        console.log(this.scanData)
       }
 
       const status_topic = mqttexec(mqttPattern.status, topic)
       if (status_topic) {
         const data = JSON.parse(message.toString())
         this.generalStore.sensors[data.id] = {...this.generalStore.sensors[data.id], ... data}
+
+        const firstItem = Object.values(this.generalStore.sensors)[0];
+        if (firstItem) {
+          this.generalStore.detail_sources = [firstItem]
+        }
       }
 
     })

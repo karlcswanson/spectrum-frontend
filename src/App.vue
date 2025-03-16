@@ -7,8 +7,6 @@ import {useIntervalFn} from "@vueuse/core";
 
 import type Socks from "@/socks.ts";
 
-// import sensors from '@/directory.json'
-
 const generalStore = GeneralStore()
 const socks = inject('socks') as Socks
 
@@ -27,9 +25,6 @@ const { pause, resume, isActive } = useIntervalFn(() => {
 
 onMounted(() => {
   console.log("connecting to MQTT")
-  // if (sensors) {
-  //   generalStore.sensors = sensors
-  // }
   socks.setup({
     // servers: [{ host: 'spectrum.zt.karlcswanson.com', port: 8083, protocol: 'ws'}]
     servers: [{ host: 'spectrum.micboard.io', port: 443, protocol: 'wss'}]
@@ -43,8 +38,6 @@ onMounted(() => {
   <div class="card sticky top-0 z-30 m-0.5">
     <Menubar :model="items"/>
   </div>
-
-
   <RouterView />
 </template>
 

@@ -19,10 +19,10 @@
 </style>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref, watch} from "vue";
+import {computed, defineComponent, inject, onMounted, ref, watch} from "vue";
 import * as d3 from 'd3'
 import {useElementSize, useEventBus} from "@vueuse/core";
-import type {RTLPowerLine} from "@/socks.ts";
+import Socks, {type RTLPowerLine} from "@/socks.ts";
 import GeneralStore from '@/stores/general.ts'
 
 export default defineComponent({
@@ -35,6 +35,8 @@ export default defineComponent({
       const chartHeight = computed(() => [height.value - margin.top - margin.bottom, 0])
       const chartWidth = computed(() => [0, width.value - margin.left - margin.right])
       const bus = useEventBus<RTLPowerLine>('spectrum-stream')
+
+      const socks = inject('socks') as Socks
 
       const unsubscribe = bus.on(listener)
 
@@ -75,7 +77,7 @@ export default defineComponent({
             power: new Float64Array(),
             condition: []
           }
-          chart_data[id].frequency = createFrequencyArray(470000000, 608000000, 25000)
+          chart_data[id].frequency = createFrequencyArray(socks.scanData[id].hz_lo, socks.scanData[id].hz_hi, socks.scanData[id].step)
           chart_data[id].power = new Float64Array(chart_data[id].frequency.length)
         }
 
@@ -143,16 +145,12 @@ export default defineComponent({
           .style('fill', 'transparent')
           .attr('transform', `translate(${margin.left},${margin.top})`)
 
-
-
-
         chartGroup
           .append('g')
           .attr('transform', `translate(0,${height.value - margin.top - margin.bottom})`)
           .call(d3.axisBottom(xScale).tickValues(d3.range(470000000, 608000000, 6000000)).tickFormat((d)=> `${d/1000000} MHz`))
 
         chartGroup.append('g').call(d3.axisLeft(yScale))
-
 
         const xGrid = (g) => g
           .attr('class', 'grid-lines')
@@ -165,7 +163,6 @@ export default defineComponent({
           .attr('y2', chartHeight.value[0])
         chartGroup
           .append('g').call(xGrid)
-
       }
 
       watch(

@@ -4,15 +4,11 @@ import {Column} from "primevue";
 import SpectrumPlot from "@/components/SpectrumPlot.vue";
 import GeneralStore from '@/stores/general.ts'
 import Socks, {type RTLPowerLine} from "@/socks.ts";
-import {inject} from "vue";
+import { inject } from "vue";
+import slugify from "slugify";
 const generalStore = GeneralStore()
 
 const socks = inject('socks') as Socks
-
-
-
-
-
 
 function convertToCSV(rtlPowerLine: RTLPowerLine): string {
   const rows: string[] = [];
@@ -35,13 +31,41 @@ function downloadScan(id: string) {
 
 }
 
+function handleDragStart(event: DragEvent) {
+  if (generalStore.detail_sources.length === 0) {
+    console.error("No source selected for export.");
+    return;
+  }
+
+  const selectedScan = generalStore.detail_sources[0]
+
+  const rtlPowerLine = socks.scanData[selectedScan.id]
+  if (!rtlPowerLine) {
+    console.error(`No data found for ID: ${selectedScan.id}`)
+    return;
+  }
+
+  const csvContent = convertToCSV(rtlPowerLine)
+
+  const fileType = "text/csv"
+  const dateString = new Date(selectedScan.last_scan).toISOString().replace(/:/g, "-").split(".")[0]
+  const fileName = `${slugify(selectedScan.name)}-${dateString}.csv`
+
+  const blob = new Blob([csvContent], {type: fileType})
+  const fileUrl = URL.createObjectURL(blob)
+
+  event.dataTransfer?.setData("DownloadURL", `${fileType}:${fileName}:${fileUrl}`);
+}
+
+
+
 
 </script>
 
 <template>
   <div>
-    <SpectrumPlot/>
-    <DataTable :value="Object.values(generalStore.sensors)" selection-mode="multiple" v-model:selection="generalStore.detail_sources" >
+    <SpectrumPlot draggable="true" @dragstart="handleDragStart" />
+    <DataTable :value="Object.values(generalStore.sensors)" selection-mode="multiple" v-model:selection="generalStore.detail_sources">
       <Column field="status" header="Status">
         <template #body="slotProps">
           <span
